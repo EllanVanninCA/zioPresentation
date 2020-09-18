@@ -1,18 +1,36 @@
 slidenumbers: true
-footer:  Chris Andr√©
+footer:  ![inline 20%](img/zio-logo.png)
 slidenumber-style: alignment(right)
 footer-style: alignment(left)
-theme: Letters from Sweden, 7
+
+[.hide-footer]
+[.slidenumbers: false]
+[.text: alignment(right)]
 
 ![inline](img/zio-logo.png)
 
----
-
-# [fit] What is ZIO?
+A presentation with memes
 
 ---
 
-## ZIO is a functional library for asynchronous and concurrent programming
+[.column]
+
+# [fit] What is
+# [fit] *ZIO*?
+
+[.column]
+
+![inline](img/use_zio.jpg)
+
+
+---
+
+## [fit] *ZIO* is
+## [fit] a *functional library* for
+## [fit] *asynchronous* and
+## [fit] *concurrent* programming
+
+### [fit] Created by _*John De Goes*_
 
 ---
 
@@ -27,23 +45,31 @@ theme: Letters from Sweden, 7
 
 ---
 
-Let's consider the following code
+For example, the following code
 
-[.code-highlight: 1]
-[.code-highlight: 3-4]
+```scala
+val myFuture = for {
+   _ <- Future{println("Hello")}
+   _ <- Future{println("Hello")}
+} yield ()
+```
+
+cannot be refactored into
 
 ```scala
 lazy val myEffect = Future{println("Hello")}
 
-myEffect
-myEffect
+val myFuture = for {
+   _ <- myEffect
+   _ <- myEffect
+} yield ()
 ```
 
-`Hello` is only displayed *once* on the screen.
+(`Hello` is only displayed *once* on the screen.)
 
 ---
 
-## [fit] Always needs to have an `ExecutionContext`
+## [fit] Always needs to have an *ExecutionContext*
 
 ![inline](img/executionContext.jpg)
 
@@ -95,7 +121,7 @@ We see a lot from the implementation from *Future* not so much about our code ü
 
 ## [fit] One effect type, multiple aliases
 
-![inline](img/supermario.gif)
+![inline](img/aliases.jpg)
 
 ---
 
@@ -105,7 +131,7 @@ We see a lot from the implementation from *Future* not so much about our code ü
 
 A *ZIO* object is the description of a *process*.
 
-It can be an **atomic action** (initialize a variable for example) or composed of **multiple sub-actions** ("Read from input", "Process the data", "Write to output").
+It can be an **atomic action** (initialize a variable for example) or composed of **multiple sub-processes** ("Read from input", "Process the data", "Write to output" can all be wrapped into "ETL process" for example).
 
 ---
 
@@ -129,6 +155,16 @@ R => Either[E, A]
 
 ---
 
+When you think about it, a *Future[A]* can be represented as the following type
+
+```scala
+ZIO[ExecutionContext, Throwable, A]
+```
+
+We need an *ExecutionContext* to run it and it returns either a value of type *A* if everything went fine or a *Throwable* if there was an Exception.
+
+---
+
 ### There are multiple aliases
 
 ```scala
@@ -145,19 +181,9 @@ type IO[E, A] = ZIO[Any, E, A]
 
 ---
 
-When you think about it, a *Future[A]* can be represented as the following type
-
-```scala
-ZIO[ExecutionContext, Throwable, A]
-```
-
-We need an *ExecutionContext* to run it and it returns either a value of type *A* if everything went fine or a *Throwable* if there was an Exception.
-
----
-
 # [fit] Using ZIO
 
-![inline](img/details.gif)
+![inline](img/using.jpg)
 
 ---
 
@@ -198,10 +224,12 @@ val program =
 
 ---
 
-# [fit] Having fun
-# [fit] with *fibers*
+[.column]
+# [fit] Having fun with
+# [fit] *fibers*
 
-![inline](img/fibers.gif)
+[.column]
+![inline](img/fibers.jpg)
 
 ---
 

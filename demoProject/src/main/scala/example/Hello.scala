@@ -1,22 +1,21 @@
 package example
 
-import zio.App
 import zio._
-import zio.clock._
 import zio.console._
 import zio.duration._
+
 import scala.language.postfixOps
 
 object Hello extends App {
-  def run(args: List[String]) =
+  def run(args: List[String]): URIO[ZEnv, ExitCode] =
     countWhileWaiting.fold(
       _ => ExitCode(1),
       _ => ExitCode(0)
     )
 
-  val answerToLife = IO.succeed(21).map(_ * 2)
+  val answerToLife: ZIO[Any, Nothing, Int] = IO.succeed(21).map(_ * 2)
 
-  val printAnswerToLife = answerToLife.flatMap(answer =>
+  val printAnswerToLife: ZIO[Console, Nothing, Unit] = answerToLife.flatMap(answer =>
     putStrLn(s"The answer to Life, the Universe and Everything is $answer")
   )
 
@@ -30,7 +29,7 @@ object Hello extends App {
   def counter(
       maxValue: Int = 10000,
       currentValue: Int = 0
-  ): ZIO[Console with Clock, Unit, Unit] = {
+  ): ZIO[ZEnv, Unit, Unit] = {
     if (currentValue >= maxValue)
       putStrLn("Finished !")
     else
@@ -41,10 +40,10 @@ object Hello extends App {
       )
   }
 
-  val waitAndComplete = for {
+  val waitAndComplete: ZIO[ZEnv, Nothing, Unit] = for {
     _ <- ZIO.unit.delay(3 seconds)
     _ <- putStrLn("I've waited for long enough!")
   } yield ()
 
-  val countWhileWaiting = counter(1000000000) race waitAndComplete
+  val countWhileWaiting: ZIO[ZEnv, Unit, Unit] = counter(1000000000) race waitAndComplete
 }
