@@ -2,11 +2,14 @@ package example
 
 import zio.App
 import zio._
+import zio.clock._
 import zio.console._
+import zio.duration._
+import scala.language.postfixOps
 
 object Hello extends App {
   def run(args: List[String]) =
-    askForAValueAndMultiplyBy2.fold(
+    countWhileWaiting.fold(
       _ => ExitCode(1),
       _ => ExitCode(0)
     )
@@ -20,7 +23,28 @@ object Hello extends App {
   val askForAValueAndMultiplyBy2: ZIO[Console, Throwable, Unit] = for {
     _ <- putStrLn("Hello! What value do you want to multiply by 2?")
     numberStr <- getStrLn
-    number <- ZIO(numberStr.toInt * 2)
-    _ <- putStrLn(s"'$numberStr' multiplied by 2 is '$number'")
+    numberTimesTwo <- ZIO(numberStr.toInt * 2)
+    _ <- putStrLn(s"'$numberStr' multiplied by 2 is '$numberTimesTwo'")
   } yield ()
+
+  def counter(
+      maxValue: Int = 10000,
+      currentValue: Int = 0
+  ): ZIO[Console with Clock, Unit, Unit] = {
+    if (currentValue >= maxValue)
+      putStrLn("Finished !")
+    else
+      putStrLn(s"Current value is $currentValue") *>
+        ZIO.unit.delay(100 milliseconds) *> counter(
+        maxValue,
+        currentValue + 1
+      )
+  }
+
+  val waitAndComplete = for {
+    _ <- ZIO.unit.delay(3 seconds)
+    _ <- putStrLn("I've waited for long enough!")
+  } yield ()
+
+  val countWhileWaiting = counter(1000000000) race waitAndComplete
 }
