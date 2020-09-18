@@ -9,8 +9,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "My ZIO Demo",
     libraryDependencies ++= List(
-      library.zio,
-      scalaTest % Test
+      //      scalaTest % Test,
+      library.zio
     )
   )
 
